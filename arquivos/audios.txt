@@ -1,0 +1,9 @@
+abertura.mp3
+batalha.mp3
+cardflip.mp3
+click.ogg
+dano.ogg
+derrota.wav
+evolucao.mp3
+superefetivo.ogg
+vitoria.mp3

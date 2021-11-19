@@ -1,0 +1,6 @@
+regirock 1900 pedra -
+meloetta 1900 lutador -
+entei 2000 fogo -
+genesect 2000 inseto -
+zapdos 1900 eletrico -
+celebi 2000 planta -

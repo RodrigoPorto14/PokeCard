@@ -1,0 +1,9 @@
+fogo planta
+planta agua
+agua fogo
+eletrico voador
+voador inseto
+inseto psiquico
+psiquico lutador
+lutador pedra
+pedra eletrico

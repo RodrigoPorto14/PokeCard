@@ -1,0 +1,5 @@
+lugia 2100 voador -
+kyogre 2100 agua -
+regigigas 2100 normal -
+mewtwo 2300 psiquico -
+rayquaza 2200 dragao -
