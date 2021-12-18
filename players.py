@@ -118,7 +118,7 @@ class Jogador(Treinador):
         return indice 
 
     # Ao clicar na carta passa o pokemon do deck para o campo de batalha
-    def posicionaPokemons(self,mx,my,indice,rodada,event,cursor,click,tutorial):
+    def posicionaPokemons(self,mx,my,indice,rodada,event,cursor,click,dadosIA,tutorial):
         maxPokemons=min(rodada,9) 
         qtdCartasIndice=calculaCartasNoIndice(indice,len(self.deck)) 
         indiceInicial=7*(indice-1) 
@@ -128,9 +128,11 @@ class Jogador(Treinador):
         cursorType=0
         for i in range(indiceInicial,indiceFinal):
             if(mx>=align+100+65*k and mx<=align+150+65*k and my>=555 and my<=625):
+                if(self.deck[i].tipo=='normal' or rodada<3 or not tutorial):
                     cursorType=1
                     if(event.type==MOUSEBUTTONDOWN):
                         click.play()
+                        dadosIA.append(self.deck[i].tipo)
                         passaObjeto(self.deck,self.batalha,i) 
             k+=1
         pygame.mouse.set_cursor(cursor[cursorType])
@@ -162,7 +164,7 @@ class Oponente(Treinador):
             print('Acabou as Cartas')
     
     # Calcula melhor opcao e seleciona duas cartas da area de compra e passa as mesmas para o deck do oponente
-    def escolheDuasCartas(self,baralho,evolucoes):
+    def escolheDuasCartas(self,baralho,evolucoes,fase):
         if(len(self.compra)>0):
             for i in range(0,2):
                 self.dadosIA['nomes'].clear()
@@ -170,13 +172,15 @@ class Oponente(Treinador):
                 for i in self.deck:
                     self.dadosIA['nomes'].append(i.nome)
                     self.dadosIA['oTipos'].append(i.tipo)
-                x = aplicaIA(self.compra,self.dadosIA)
+                x = aplicaIA(self.compra,self.dadosIA,fase)
                 passaObjeto(self.compra,self.deck,x,True)
                 self.deck = evoluiPokemon(self.deck,evolucoes,True)
                 self.deck = sorted(self.deck,key=lambda x:(-x.poderAtual,x.nome),reverse=False)
-                
+            
+            self.dadosIA['jTipos'].clear()
             for i in range(0,3):
                 passaObjeto(self.compra,baralho.cartas,0)
+            
         else:
             return
     
@@ -184,7 +188,7 @@ class Oponente(Treinador):
     def posicionaPokemons(self,rodada):
         tipos = carregaArquivo('arquivos/tipos.txt')
         pokesBatalha = min(rodada,len(self.deck),9)
-        infoPokes = [] ; indiceMelhores = [] ; pokesIndice=[]
+        infoPokes = [] ; indiceMelhores = [] ; pokesIndice=[] ; indiceOtimos=[]
         melhor=0
         for i in range(0,pokesBatalha):
             infoPokes.append([[i],self.deck[i].poderAtual,1])
@@ -219,6 +223,8 @@ class Oponente(Treinador):
             removeMaior(infoPokes)
         
         indiceMelhores.sort(reverse=True)
+
+
 
         for i in indiceMelhores:
             passaObjeto(self.deck,self.batalha,i)

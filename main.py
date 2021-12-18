@@ -16,7 +16,7 @@ oponente = Oponente()
 batalha = Batalha()
 timer = Timer()
 
-cena=0 ; mx=0 ; my=0 ; indice=1 ; rodada=1 ; tutorial=True
+cena=0 ; mx=0 ; my=0 ; indice=1 ; rodada=1 ; fase=1 ; faseAtual=0 ; tutorial=True
 hand = pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND)
 arrow = pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW)
 audio={}
@@ -26,14 +26,12 @@ icon = pygame.image.load('imagens/icon.png')
 pygame.display.set_caption('PokeCard')
 pygame.display.set_icon(icon)
 audio['abertura'].set_volume(0.1)
-audio['batalha'].set_volume(0.2)
+audio['batalha'].set_volume(0.25)
 
 if(arquivoExiste('arquivos/save.bin')):
     arq = open('arquivos/save.bin','rb')
     tutorial = arq.read()
-    print(tutorial)
     arq.close()
-
 
 while True:
     for event in pygame.event.get():
@@ -47,13 +45,13 @@ while True:
         
         # (0) Cena do menu
         if(cena==0):
-            audio['abertura'].play()
+            audio['abertura'].play(-1)
             if(mx>=143 and mx<=477 and my>=249 and my<=322):
                 pygame.mouse.set_cursor(hand)
                 if(event.type==MOUSEBUTTONDOWN):
                     audio['abertura'].stop()
                     audio['click'].play()
-                    if(tutorial):
+                    if(tutorial): 
                         cena=1
                     else:
                         cena=2
@@ -62,7 +60,7 @@ while True:
         
         # (1) Cena do tutorial
         if(cena==1):
-            audio['batalha'].play()
+            audio['batalha'].play(-1)
             jogador.vida=500 ; oponente.vida=500
             jogador.vidaOriginal=500 ; oponente.vidaOriginal=500
             baralho = Baralho('arquivos/cartas_tutorial.txt',1)
@@ -70,12 +68,37 @@ while True:
         
         # (2) Cena liga pokemon
         if(cena==2):
-            audio['batalha'].play()
-            jogador.vida=5000 ; oponente.vida=5000
-            jogador.vidaOriginal=5000 ; oponente.vidaOriginal=5000
-            indice=1 ; rodada=1
-            baralho = Baralho('arquivos/cartas_comum.txt',6)
-            cena = 3
+            audio['abertura'].play(-1)
+            mouseHand=False
+            start=False
+            for i in range(0,4):
+                if(fase<=2):
+                    if(mx>=101+179*i and mx<=183+179*i and my>=451 and my<=533 and fase>=i):
+                        mouseHand=True
+                        if(event.type==MOUSEBUTTONDOWN):
+                            faseAtual=i
+                            start=True
+                elif(mx>=280 and mx<=362 and my>=295 and my<=377):
+                    mouseHand=True
+                    if(event.type==MOUSEBUTTONDOWN):
+                        faseAtual=i
+                        start=True
+            
+            if(mouseHand):
+                pygame.mouse.set_cursor(hand)
+            else:
+                pygame.mouse.set_cursor(arrow)
+                
+            if(start):
+                audio['abertura'].stop()
+                audio['batalha'].play(-1)
+                jogador.vida=5000 ; oponente.vida=5000
+                jogador.vidaOriginal=5000 ; oponente.vidaOriginal=5000
+                indice=1 ; rodada=1
+                baralho = Baralho('arquivos/cartas_comum.txt',6)
+                audio['click'].play()
+                start=False
+                cena = 3
             
         
         # (3-4) Cena de compra das cartas
@@ -83,18 +106,21 @@ while True:
             cena = jogador.pegaCincoCartas(baralho,mx,my,event,(arrow,hand),audio['cardflip'],tutorial)
             if(cena==4):
                 oponente.pegaCincoCartas(baralho,tutorial)
+                for i in oponente.compra:
+                    print(f'{i.nome}',end = ' ')
+                print('\n')
                 cena=5
 
         # (5-6) Cena de escolha das cartas
         elif(cena==5):
             cena = jogador.escolheDuasCartas(baralho,mx,my,evolucoes.cartas,event,(arrow,hand),(audio['click'],audio['evolucao']),tutorial)
             if(cena==6):
-                oponente.escolheDuasCartas(baralho,evolucoes.cartas)            
+                oponente.escolheDuasCartas(baralho,evolucoes.cartas,fase)            
                 cena=7
 
         # (7-8) Cena de posicionamento dos pokemons
         elif(cena==7):
-            cena = jogador.posicionaPokemons(mx,my,indice,rodada,event,(arrow,hand),audio['click'],tutorial)
+            cena = jogador.posicionaPokemons(mx,my,indice,rodada,event,(arrow,hand),audio['click'],oponente.dadosIA['jTipos'],tutorial)
             if(cena==8):
                 oponente.posicionaPokemons(rodada)
                 timer.tempoOrigem=time.time()
@@ -125,6 +151,7 @@ while True:
             if(jogador.vida<=0 or oponente.vida<=0):
                 audio['batalha'].stop()
                 if(jogador.vida>0):
+                    faseAtual+=1
                     audio['vitoria'].play()
                 else:
                     audio['derrota'].play()
@@ -149,13 +176,17 @@ while True:
                 arq = open('arquivos/save.bin','wb')
                 arq.write(bytes(tutorial))
                 arq.close()
-            cena=0
+            else:
+                fase = max(faseAtual,fase)
+            cena=2
 
     # Desenho de sprites
     if(cena==0):
         tela.desenhaTelaTitulo(mx,my)
-    else:
-        tela.desenhaFundo(rodada)
+    elif(cena==2):
+            tela.desenhaLigaPokemon(fase)
+    elif(cena>=3):
+        tela.desenhaFundo(rodada,faseAtual,tutorial)
         tela.desenhaBarraVida((jogador.vida,oponente.vida),(jogador.vidaOriginal,oponente.vidaOriginal))
         tela.desenhaInsignias(jogador.insignias,oponente.insignias)
         tela.desenhaFases(cena)
@@ -167,10 +198,10 @@ while True:
             tela.desenhaCartasCompra(jogador.compra)
         if(len(oponente.batalha)>0 or len(jogador.batalha)>0):
             tela.desenhaCartasBatalha(jogador.batalha,oponente.batalha,rodada)
+        if(cena>0 and tutorial):
+            tela.desenhaTutorial(rodada,cena)
+    
         if(cena==11):
             tela.desenhaFinalBatalha(jogador.vida)
-    
-    if(cena>0 and tutorial):
-        tela.desenhaTutorial(rodada,cena)
-      
+
     pygame.display.update()

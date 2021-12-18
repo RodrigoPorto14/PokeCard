@@ -145,11 +145,11 @@ def evoluiPokemon(deck,evolucoes,oponente=False,evolucao=0):
     return deck
 
 # Calcula a carta de maior valor entre as cartas que o oponente comprou
-def aplicaIA(compra,dadosIA):
+def aplicaIA(compra,dadosIA,fase):
     pontos=[0,0,0,0,0]
     dadosCompra={'nomes':[],'oTipos':[]}
     x=0 # pokemon que esta sendo analisado
-
+    efeitos = carregaArquivo('arquivos/super_efetivo.txt',True)
     # coloca as cartas de compra no banco de dados IA
     if(len(compra)==5): 
         x=1
@@ -159,20 +159,32 @@ def aplicaIA(compra,dadosIA):
 
     # calcula o valor de cada carta de compra
     for i in compra:
-        pontos[compra.index(i)]+= min((dadosIA['nomes'].count(i.nome)),2) * 10000
-        pontos[compra.index(i)]+= (dadosIA['oTipos'].count(i.tipo)) * 6000
-        pontos[compra.index(i)]+=min((dadosCompra['nomes'].count(i.nome))-x,1) * 10000
-        pontos[compra.index(i)]+=min((dadosCompra['oTipos'].count(i.tipo))-x,1) * 6000
-        if(i.poderAtual>=1900):
-            pontos[compra.index(i)]+=50000
+        if(fase>0):
+            if(fase==2 or fase==3):
+                pontos[compra.index(i)]+= min((dadosIA['nomes'].count(i.nome)),2) * 10000
+                pontos[compra.index(i)]+=min((dadosCompra['nomes'].count(i.nome))-x,1) * 10000
+            if(fase==1 or fase==3):
+                pontos[compra.index(i)]+= (dadosIA['oTipos'].count(i.tipo)) * 6000
+                pontos[compra.index(i)]+=min((dadosCompra['oTipos'].count(i.tipo))-x,1) * 6000
+            
+            for j in dadosIA['jTipos']:  
+                for k in efeitos:
+                    if(i.tipo==k[0] and j==k[1]):
+                            pontos[compra.index(i)]+= 150
 
-        if((dadosIA['nomes'].count(i.nome))>0):
-            pontos[compra.index(i)]+= dadosIA['evolucoes'][i.evolucao]
+            if(i.poderAtual>=1900):
+                pontos[compra.index(i)]+=50000
+
+            if((dadosIA['nomes'].count(i.nome))>0):
+                pontos[compra.index(i)]+= dadosIA['evolucoes'][i.evolucao]
+            else:
+                pontos[compra.index(i)]+=i.poderAtual
         else:
             pontos[compra.index(i)]+=i.poderAtual
 
     dadosCompra.clear()
     dadosCompra.clear()
+    print(pontos)
           
     # retorna o indice da carta com maior valor
     return pontos.index(max(pontos))
@@ -190,9 +202,11 @@ def setInsignias(batalha,insignias):
             insignias.append(i)
             k=0
             for j in batalha:
-                if(j.tipo==i):
-                    j.poderAtual+=300
-                    k+=1
+                for nome in pokesCombo:
+                    if(j.nome==nome):
+                        j.poderAtual+=300
+                        pokesCombo.remove(nome)
+                        k+=1
                 if(k==3):
                     break
                 

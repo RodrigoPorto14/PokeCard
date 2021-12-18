@@ -21,12 +21,17 @@ class Tela:
     def fonteTitulo(self):
         return self.__fonteTitulo
     
-    def desenhaFundo(self,rodada):
+    def desenhaFundo(self,rodada,fase,tutorial):
+        nomeImagem = 'fase' + str(fase)
+        if(tutorial):
+            nomeImagem='tutorial'
         self.janela.blit(self.img['arena'],(0,0))
+        self.janela.blit(self.img[nomeImagem],(561,117))
         align=0
         if(rodada<10):
             align = 2
         self.janela.blit(self.fonte.render(str(rodada),False,(0,0,0)),(align+316,312))
+
 
     def desenhaBarraVida(self,vida,vidaOriginal):
         for i in range(0,2):
@@ -151,6 +156,26 @@ class Tela:
         larguraTexto=len(vencedor)*18
         align = (640 - larguraTexto)/2
         self.janela.blit(self.fonteTitulo.render(vencedor,False,(255,255,255)),(align,303))
+    
+    def desenhaLigaPokemon(self,fase):
+        self.janela.blit(self.img['ligapokemon'],(0,0))
+        self.janela.blit(self.img['trofeu'],(287,175))
+        for i in range (0,4):
+            if(fase>=i):
+                nomeImagem = 'fase' + str(i)
+            else:
+                nomeImagem = 'cadeado'
+            if(i<=2):
+                pygame.draw.rect(self.janela,(51,102,168),(101+179*i,451,82,82),4)
+                self.janela.blit(self.img[nomeImagem],(104+179*i,454))
+            else:
+                pygame.draw.rect(self.janela,(51,102,168),(280,295,82,82),4)
+                self.janela.blit(self.img[nomeImagem],(283,298))
+                
+            
+
+        
+        
 
 
         

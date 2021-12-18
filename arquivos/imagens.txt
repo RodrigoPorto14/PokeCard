@@ -35,3 +35,11 @@ fala6
 fala7
 fala8
 fala9
+ligapokemon
+cadeado
+trofeu
+fase0
+fase1
+fase2
+fase3
+tutorial
