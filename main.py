@@ -16,7 +16,7 @@ oponente = Oponente()
 batalha = Batalha()
 timer = Timer()
 
-cena=0 ; mx=0 ; my=0 ; indice=1 ; rodada=1 ; fase=1 ; faseAtual=0 ; tutorial=True
+cena=0 ; mx=0 ; my=0 ; indice=1 ; rodada=1 ; fase=0 ; faseAtual=0 ; tutorial=True
 hand = pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND)
 arrow = pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW)
 audio={}
@@ -72,17 +72,17 @@ while True:
             mouseHand=False
             start=False
             for i in range(0,4):
-                if(fase<=2):
-                    if(mx>=101+179*i and mx<=183+179*i and my>=451 and my<=533 and fase>=i):
+                if(mx>=101+179*i and mx<=183+179*i and my>=451 and my<=533 and fase>=i):
                         mouseHand=True
                         if(event.type==MOUSEBUTTONDOWN):
                             faseAtual=i
                             start=True
-                elif(mx>=280 and mx<=362 and my>=295 and my<=377):
-                    mouseHand=True
-                    if(event.type==MOUSEBUTTONDOWN):
-                        faseAtual=i
-                        start=True
+                if(fase>=3):    
+                    if(mx>=280 and mx<=362 and my>=295 and my<=377):
+                        mouseHand=True
+                        if(event.type==MOUSEBUTTONDOWN):
+                            faseAtual=i
+                            start=True
             
             if(mouseHand):
                 pygame.mouse.set_cursor(hand)
@@ -122,7 +122,7 @@ while True:
         elif(cena==7):
             cena = jogador.posicionaPokemons(mx,my,indice,rodada,event,(arrow,hand),audio['click'],oponente.dadosIA['jTipos'],tutorial)
             if(cena==8):
-                oponente.posicionaPokemons(rodada)
+                oponente.posicionaPokemons(rodada,jogador.batalha,fase)
                 timer.tempoOrigem=time.time()
                 if(len(timer.count)<2):
                     timer.criaContador(0)
@@ -151,7 +151,6 @@ while True:
             if(jogador.vida<=0 or oponente.vida<=0):
                 audio['batalha'].stop()
                 if(jogador.vida>0):
-                    faseAtual+=1
                     audio['vitoria'].play()
                 else:
                     audio['derrota'].play()
@@ -168,6 +167,8 @@ while True:
         if(timer.sec>=10):
             audio['vitoria'].stop()
             audio['derrota'].stop()
+            if(jogador.vida>0 and faseAtual<3):
+                    faseAtual+=1
             jogador.deck.clear()
             oponente.deck.clear()
             baralho.cartas.clear()

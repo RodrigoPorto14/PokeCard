@@ -160,17 +160,18 @@ def aplicaIA(compra,dadosIA,fase):
     # calcula o valor de cada carta de compra
     for i in compra:
         if(fase>0):
-            if(fase==2 or fase==3):
-                pontos[compra.index(i)]+= min((dadosIA['nomes'].count(i.nome)),2) * 10000
-                pontos[compra.index(i)]+=min((dadosCompra['nomes'].count(i.nome))-x,1) * 10000
-            if(fase==1 or fase==3):
+            pontos[compra.index(i)]+= min((dadosIA['nomes'].count(i.nome)),2) * 10000
+            pontos[compra.index(i)]+=min((dadosCompra['nomes'].count(i.nome))-x,1) * 10000
+            
+            if(fase>1):
                 pontos[compra.index(i)]+= (dadosIA['oTipos'].count(i.tipo)) * 6000
                 pontos[compra.index(i)]+=min((dadosCompra['oTipos'].count(i.tipo))-x,1) * 6000
             
-            for j in dadosIA['jTipos']:  
-                for k in efeitos:
-                    if(i.tipo==k[0] and j==k[1]):
-                            pontos[compra.index(i)]+= 150
+            if(fase>2):
+                for j in dadosIA['jTipos']:  
+                    for k in efeitos:
+                        if(i.tipo==k[0] and j==k[1]):
+                                pontos[compra.index(i)]+= 150
 
             if(i.poderAtual>=1900):
                 pontos[compra.index(i)]+=50000

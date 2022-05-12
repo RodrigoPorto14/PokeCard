@@ -1,6 +1,8 @@
 from pygame.locals import *
 from auxiliares import *
 from random import randint,shuffle
+from itertools import permutations
+from functools import reduce
 import pygame
 
 class Treinador:
@@ -185,7 +187,7 @@ class Oponente(Treinador):
             return
     
      # Calcula melhor forma de como posicionar os pokemons
-    def posicionaPokemons(self,rodada):
+    def posicionaPokemons(self,rodada,jBatalha,fase):
         tipos = carregaArquivo('arquivos/tipos.txt')
         pokesBatalha = min(rodada,len(self.deck),9)
         infoPokes = [] ; indiceMelhores = [] ; pokesIndice=[] ; indiceOtimos=[]
@@ -224,7 +226,22 @@ class Oponente(Treinador):
         
         indiceMelhores.sort(reverse=True)
 
-
+        '''arranjo = permutations(indiceMelhores,len(indiceMelhores))
+        if(fase>=3):
+            atualizado = []
+            maior=0
+            efeitos = carregaArquivo('arquivos/super_efetivo.txt',True)
+            for combinacoes in arranjo:
+                for i in combinacoes:
+                    atualizado.append([self.deck[i].poderAtual,i])
+                    for j in jBatalha:
+                        for k in efeitos:
+                            if(self.deck[i].tipo==k[0] and j.tipo==k[1]):
+                                atualizado[len(atualizado)-1][0]+=500
+                if(reduce(lambda a,b:[a[0]+b[0]],atualizado)[0]>maior):
+                    indiceMelhores = map(lambda a:a[1],atualizado)
+                    maior = reduce(lambda a,b:[a[0]+b[0]],atualizado)[0]
+                atualizado.clear()'''
 
         for i in indiceMelhores:
             passaObjeto(self.deck,self.batalha,i)
