@@ -185,7 +185,6 @@ def aplicaIA(compra,dadosIA,fase):
 
     dadosCompra.clear()
     dadosCompra.clear()
-    print(pontos)
           
     # retorna o indice da carta com maior valor
     return pontos.index(max(pontos))

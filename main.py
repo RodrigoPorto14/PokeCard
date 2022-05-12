@@ -106,9 +106,6 @@ while True:
             cena = jogador.pegaCincoCartas(baralho,mx,my,event,(arrow,hand),audio['cardflip'],tutorial)
             if(cena==4):
                 oponente.pegaCincoCartas(baralho,tutorial)
-                for i in oponente.compra:
-                    print(f'{i.nome}',end = ' ')
-                print('\n')
                 cena=5
 
         # (5-6) Cena de escolha das cartas
