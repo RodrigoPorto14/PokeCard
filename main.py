@@ -16,7 +16,7 @@ oponente = Oponente()
 batalha = Batalha()
 timer = Timer()
 
-cena=0 ; mx=0 ; my=0 ; indice=1 ; rodada=1 ; fase=3 ; faseAtual=0 ; tutorial=True
+cena=0 ; mx=0 ; my=0 ; indice=1 ; rodada=1 ; fase=0 ; faseAtual=0 ; tutorial=True
 hand = pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND)
 arrow = pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW)
 audio={}
