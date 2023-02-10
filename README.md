@@ -3,6 +3,8 @@ PokeCard
 
 Como o nome já diz, é um jogo de cartas de pokémon, que desenvolvi para praticar Python utilizando vários de seus recursos em sua implementação.
 
+![alt text](imagens/pokegithub.png)
+
 Instalação
 ------------
 
